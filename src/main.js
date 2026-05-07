@@ -21,8 +21,6 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ReinhardToneMapping;
-// FIX #1 : exposition réduite de 2.8 → 1.4 pour éviter la saturation Reinhard
-// qui causait les "trous noirs" clignotants chaque seconde
 renderer.toneMappingExposure = 1.4;
 
 // ─── POINTER LOCK ────────────────────────────────────────
@@ -159,7 +157,6 @@ for(let i=0;i<5;i++){
   sphere(0.03,make(0xffdd55,0.1,0,0xffcc00,14),ax,RH-0.48,az);
   chanLights.push(plight(0xffaa55,6,6,ax,RH-0.5,az));
 }
-// FIX #2 : intensité du lustre principal réduite (35→16) pour éviter la saturation
 const chanMain=plight(0xffcc88,16,20,CX,RH-0.85,CZ,true);
 
 // Second lustre
@@ -284,11 +281,9 @@ sconcePos.forEach(([sx,sy,sz])=>{
   box(0.19,0.065,0.27,goldMat,sx+ox,sy-0.02,sz);
   cyl(0.026,0.026,0.21,8,creamMat,sx+ox,sy+0.055,sz);
   sphere(0.031,make(0xffdd66,0.1,0,0xffcc00,14),sx+ox,sy+0.17,sz);
-  // FIX #3 : intensité des appliques réduite (18→8) pour éviter la surcharge lumineuse
   sconceLights.push(plight(0xffbb66,8,7,sx+ox*1.5,sy+0.16,sz));
 });
 
-// FIX #4 : lumière ambiante réduite (1.8→0.8) pour équilibrer l'éclairage global
 scene.add(new THREE.AmbientLight(0xffddbb, 0.8));
 scene.add(new THREE.HemisphereLight(0xffcc99, 0x2a1008, 0.8));
 const fill = new THREE.DirectionalLight(0xffddbb, 0.8);
@@ -302,8 +297,6 @@ scene.add(backSpot); scene.add(backSpot.target);
 // ─── CHARGEMENT DES OBJETS 3D GLB FLOTTANTS ──────────────
 // ═══════════════════════════════════════════════════════════
 
-// Centre de la pièce = RH / 2 = 3.2 / 2 = 1.6
-// Les y varient légèrement autour de 1.6 (±0.15) pour éviter que tout soit au même niveau
 const objectConfigs = [
   { file: '19e20310_base_basic_pbr.glb', x:  0.0, y: 1.60, z: -3.0, s: 0.5, ry: 0.0,  fa: 0.12, fs: 0.80 },
   { file: '2963748f_base_basic_pbr.glb', x: -3.5, y: 1.55, z: -5.0, s: 0.5, ry: 0.5,  fa: 0.15, fs: 0.65 },
@@ -324,36 +317,27 @@ const objectConfigs = [
   { file: '834cb512_base_basic_pbr.glb', x: -1.5, y: 1.65, z:  6.0, s: 0.5, ry: 0.7,  fa: 0.12, fs: 0.80 },
 ];
 
-// FIX #5 : une seule déclaration de floatingObjects (suppression de window.floatingObjects)
-// L'ancienne double déclaration (window.floatingObjects + const floatingObjects)
-// causait un conflit de scope qui empêchait le raycasting de fonctionner
 const floatingObjects = [];
 
-// Fonction pour centrer et normaliser un modèle GLB automatiquement
 function normalizeModel(gltf, config) {
   const model = gltf.scene;
 
-  // Calculer la bounding box pour auto-scaler
   const bbox = new THREE.Box3().setFromObject(model);
   const size = new THREE.Vector3();
   bbox.getSize(size);
   const maxDim = Math.max(size.x, size.y, size.z);
 
-  // Normaliser à ~1 unité puis appliquer le scale config
   const normalScale = (1.0 / maxDim) * config.s;
   model.scale.setScalar(normalScale);
 
-  // Re-centrer après scale
   const bbox2 = new THREE.Box3().setFromObject(model);
   const center = new THREE.Vector3();
   bbox2.getCenter(center);
   model.position.sub(center);
 
-  // Positionner dans la scène
   model.position.set(config.x, config.y, config.z);
   model.rotation.y = config.ry;
 
-  // Ombres
   model.traverse(child => {
     if (child.isMesh) {
       child.castShadow = true;
@@ -363,7 +347,6 @@ function normalizeModel(gltf, config) {
 
   scene.add(model);
 
-  // FIX #6 : intensité des glow lights réduite (0.8→0.3) pour ne pas surcharger le budget lumineux
   const glowLight = new THREE.PointLight(0xaa6633, 0.3, 2.0);
   glowLight.position.set(config.x, config.y - 0.3, config.z);
   scene.add(glowLight);
@@ -381,11 +364,11 @@ function normalizeModel(gltf, config) {
   console.log(`✓ Chargé: ${config.file}`);
 }
 
-// Charger tous les objets
+// ✅ CORRECTION : chemin absolu /models/ au lieu de ./models/
 const loader = new GLTFLoader();
 objectConfigs.forEach(config => {
   loader.load(
-    `./models/${config.file}`,
+    `/models/${config.file}`,
     (gltf) => normalizeModel(gltf, config),
     (progress) => {
       if (progress.total > 0) {
@@ -439,7 +422,6 @@ function animate() {
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
 
-  // Vacillement lumières avec amplitudes réduites pour rester dans le budget lumineux
   chanMain.intensity  = 15 + Math.sin(t*7.3)*2 + Math.sin(t*13)*1;
   chanMain2.intensity = 13 + Math.sin(t*5.1)*1.5;
   chanLights.forEach((cl,i)  => { cl.intensity = 5  + Math.sin(t*9+i)*1.5; });
@@ -449,7 +431,6 @@ function animate() {
   sideLight.intensity   = 9  + Math.sin(t*12)*2;
   miroirLight.intensity = 7  + Math.sin(t*10)*1.5;
 
-  // Animation des objets GLB flottants
   floatingObjects.forEach(obj => {
     obj.mesh.position.y = obj.baseY + Math.sin(t * obj.floatSpeed + obj.floatOffset) * obj.floatAmp;
     obj.mesh.rotation.y += obj.rotSpeed;
@@ -481,7 +462,6 @@ const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let score = 0;
 
-// Construire la liste de tous les meshes enfants des objets GLB
 function getAllMeshes() {
   const meshes = [];
   floatingObjects.forEach(obj => {
@@ -492,7 +472,6 @@ function getAllMeshes() {
   return meshes;
 }
 
-// Trouver quel objet flottant contient un mesh donné
 function findParentObject(mesh) {
   return floatingObjects.find(obj => {
     let found = false;
@@ -504,7 +483,7 @@ function findParentObject(mesh) {
 document.addEventListener('keydown', async (e) => {
   if (e.key.toLowerCase() !== 'e' || !controls.isLocked) return;
 
-  mouse.set(0, 0); // Centre de l'écran
+  mouse.set(0, 0);
   raycaster.setFromCamera(mouse, camera);
 
   const allMeshes = getAllMeshes();
@@ -514,26 +493,21 @@ document.addEventListener('keydown', async (e) => {
     const parentObj = findParentObject(hits[0].object);
     if (!parentObj) return;
 
-    // 1. Récupérer les données locales du film liées à cet objet
     const index = floatingObjects.indexOf(parentObj);
     const filmLocal = films[index % films.length];
 
-    // 2. Déverrouiller la souris pour permettre la saisie
     controls.unlock();
 
-    // 3. Demander le nom au joueur
     const reponseJoueur = prompt(`❓ Quel est le nom de ce film ? (Indice : Sorti en ${filmLocal.release_year})`);
 
     if (reponseJoueur) {
-      // 4. Appeler l'API TMDB pour vérifier si le nom saisi correspond au titre officiel
       const dataAPI = await getFilmById(filmLocal.title);
       
       if (dataAPI) {
-        // On compare la saisie du joueur avec le titre de la base de données
         const isCorrect = checkAnswer(dataAPI.title, reponseJoueur);
 
         if (isCorrect) {
-          score += 10; // On peut imaginer un bonus
+          score += 10;
           alert(`✅ Bravo ! C'est bien "${dataAPI.title}".\nScore : ${score}`);
         } else {
           alert(`❌ Non ! Il s'agissait de "${dataAPI.title}".`);
