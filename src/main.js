@@ -298,23 +298,23 @@ scene.add(backSpot); scene.add(backSpot.target);
 // ═══════════════════════════════════════════════════════════
 
 const objectConfigs = [
-  { file: '19e20310_base_basic_pbr.glb', x:  0.0, y: 1.60, z: -3.0, s: 0.5, ry: 0.0,  fa: 0.12, fs: 0.80 },
-  { file: '2963748f_base_basic_pbr.glb', x: -3.5, y: 1.55, z: -5.0, s: 0.5, ry: 0.5,  fa: 0.15, fs: 0.65 },
-  { file: '3d06ccb6_base_basic_pbr.glb', x:  3.5, y: 1.65, z: -5.5, s: 0.5, ry: 1.0,  fa: 0.10, fs: 0.90 },
-  { file: '4a72bdf2_base_basic_pbr.glb', x: -5.0, y: 1.50, z: -2.0, s: 0.5, ry: 0.3,  fa: 0.18, fs: 0.70 },
-  { file: '642cf26c_base_basic_pbr.glb', x:  5.0, y: 1.60, z: -1.5, s: 0.5, ry: 0.8,  fa: 0.13, fs: 0.75 },
-  { file: '68053380_base_basic_pbr.glb', x: -7.0, y: 1.70, z:  0.5, s: 0.5, ry: 1.2,  fa: 0.14, fs: 0.85 },
-  { file: '8b55883e_base_basic_pbr.glb', x:  7.0, y: 1.55, z:  0.0, s: 0.5, ry: 0.6,  fa: 0.11, fs: 0.95 },
-  { file: '8f5fc837_base_basic_pbr.glb', x: -2.5, y: 1.65, z: -7.0, s: 0.5, ry: 1.8,  fa: 0.16, fs: 0.60 },
-  { file: '909e698a_base_basic_pbr.glb', x:  2.5, y: 1.60, z: -7.0, s: 0.5, ry: 2.1,  fa: 0.12, fs: 1.00 },
-  { file: 'b573e801_base_basic_pbr.glb', x: -6.0, y: 1.50, z: -5.5, s: 0.5, ry: 0.9,  fa: 0.20, fs: 0.55 },
-  { file: 'c81f3a64_base_basic_pbr.glb', x:  6.0, y: 1.70, z: -4.5, s: 0.5, ry: 1.5,  fa: 0.15, fs: 0.80 },
-  { file: 'dbc31598_base_basic_pbr.glb', x:  0.0, y: 1.60, z:  4.5, s: 0.5, ry: 0.2,  fa: 0.13, fs: 0.70 },
-  { file: 'e2b4c756_base_basic_pbr.glb', x: -4.0, y: 1.55, z:  3.0, s: 0.5, ry: 1.7,  fa: 0.17, fs: 0.75 },
-  { file: 'fea72906_base_basic_pbr.glb', x:  4.0, y: 1.65, z:  2.5, s: 0.5, ry: 0.4,  fa: 0.11, fs: 0.85 },
-  { file: '69cc5cb7_base_basic_pbr.glb', x: -8.0, y: 1.60, z: -3.0, s: 0.5, ry: 2.5,  fa: 0.14, fs: 0.65 },
-  { file: '822c4617_base_basic_pbr.glb', x:  8.0, y: 1.50, z: -2.0, s: 0.5, ry: 1.1,  fa: 0.19, fs: 0.90 },
-  { file: '834cb512_base_basic_pbr.glb', x: -1.5, y: 1.65, z:  6.0, s: 0.5, ry: 0.7,  fa: 0.12, fs: 0.80 },
+  { file: '19e20310_base_basic_pbr.glb', x:  0.0, y: 1.60, z: -3.0, s: 0.5, ry: 0.0,  fa: 0.12, fs: 0.80, filmTitle: 'Twilight' },
+  { file: '2963748f_base_basic_pbr.glb', x: -3.5, y: 1.55, z: -5.0, s: 0.5, ry: 0.5,  fa: 0.15, fs: 0.65, filmTitle: 'Underworld' },
+  { file: '3d06ccb6_base_basic_pbr.glb', x:  3.5, y: 1.65, z: -5.5, s: 0.5, ry: 1.0,  fa: 0.10, fs: 0.90, filmTitle: 'Van Helsing' },
+  { file: '4a72bdf2_base_basic_pbr.glb', x: -5.0, y: 1.50, z: -2.0, s: 0.5, ry: 0.3,  fa: 0.18, fs: 0.70, filmTitle: 'Legacies' },
+  { file: '642cf26c_base_basic_pbr.glb', x:  5.0, y: 1.60, z: -1.5, s: 0.5, ry: 0.8,  fa: 0.13, fs: 0.75, filmTitle: 'Dracula' },
+  { file: '68053380_base_basic_pbr.glb', x: -7.0, y: 1.70, z:  0.5, s: 0.5, ry: 1.2,  fa: 0.14, fs: 0.85, filmTitle: 'V Wars' },
+  { file: '8b55883e_base_basic_pbr.glb', x:  7.0, y: 1.55, z:  0.0, s: 0.5, ry: 0.6,  fa: 0.11, fs: 0.95, filmTitle: 'The Originals' },
+  { file: '8f5fc837_base_basic_pbr.glb', x: -2.5, y: 1.65, z: -7.0, s: 0.5, ry: 1.8,  fa: 0.16, fs: 0.60, filmTitle: 'The Vampire Diaries' },
+  { file: '909e698a_base_basic_pbr.glb', x:  2.5, y: 1.60, z: -7.0, s: 0.5, ry: 2.1,  fa: 0.12, fs: 1.00, filmTitle: 'Blade' },
+  { file: 'b573e801_base_basic_pbr.glb', x: -6.0, y: 1.50, z: -5.5, s: 0.5, ry: 0.9,  fa: 0.20, fs: 0.55, filmTitle: 'Morbius' },
+  { file: 'c81f3a64_base_basic_pbr.glb', x:  6.0, y: 1.70, z: -4.5, s: 0.5, ry: 1.5,  fa: 0.15, fs: 0.80, filmTitle: 'Sinners' },
+  { file: 'dbc31598_base_basic_pbr.glb', x:  0.0, y: 1.60, z:  4.5, s: 0.5, ry: 0.2,  fa: 0.13, fs: 0.70, filmTitle: 'True Blood' },
+  { file: 'e2b4c756_base_basic_pbr.glb', x: -4.0, y: 1.55, z:  3.0, s: 0.5, ry: 1.7,  fa: 0.17, fs: 0.75, filmTitle: 'Buffy the Vampire Slayer' },
+  { file: 'fea72906_base_basic_pbr.glb', x:  4.0, y: 1.65, z:  2.5, s: 0.5, ry: 0.4,  fa: 0.11, fs: 0.85, filmTitle: 'Day Shift' },
+  { file: '69cc5cb7_base_basic_pbr.glb', x: -8.0, y: 1.60, z: -3.0, s: 0.5, ry: 2.5,  fa: 0.14, fs: 0.65, filmTitle: 'The Strain' },
+  { file: '822c4617_base_basic_pbr.glb', x:  8.0, y: 1.50, z: -2.0, s: 0.5, ry: 1.1,  fa: 0.19, fs: 0.90, filmTitle: 'Penny Dreadful' },
+  { file: '834cb512_base_basic_pbr.glb', x: -1.5, y: 1.65, z:  6.0, s: 0.5, ry: 0.7,  fa: 0.12, fs: 0.80, filmTitle: 'Le Dernier Voyage du Demeter' },
 ];
 
 const floatingObjects = [];
@@ -359,6 +359,7 @@ function normalizeModel(gltf, config) {
     floatOffset: Math.random() * Math.PI * 2,
     rotSpeed: (Math.random() - 0.5) * 0.004,
     glowLight,
+    filmTitle: config.filmTitle,
   });
 
   console.log(`✓ Chargé: ${config.file}`);
@@ -494,14 +495,15 @@ document.addEventListener('keydown', async (e) => {
     if (!parentObj) return;
 
     const index = floatingObjects.indexOf(parentObj);
-    const filmLocal = films[index % films.length];
+    const filmTitle = parentObj.filmTitle;
+    const filmLocal = films.find(f => f.title === filmTitle) || films[index % films.length];
 
     controls.unlock();
 
     const reponseJoueur = prompt(`❓ Quel est le nom de ce film ? (Indice : Sorti en ${filmLocal.release_year})`);
 
     if (reponseJoueur) {
-      const dataAPI = await getFilmById(filmLocal.title);
+      const dataAPI = await getFilmById(filmTitle);
       
       if (dataAPI) {
         const isCorrect = checkAnswer(dataAPI.title, reponseJoueur);
@@ -511,6 +513,16 @@ document.addEventListener('keydown', async (e) => {
           alert(`✅ Bravo ! C'est bien "${dataAPI.title}".\nScore : ${score}`);
         } else {
           alert(`❌ Non ! Il s'agissait de "${dataAPI.title}".`);
+        }
+      } else {
+        // Fallback si l'API ne retourne rien : comparaison locale
+        const normalize = s => s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const isCorrect = normalize(reponseJoueur) === normalize(filmTitle);
+        if (isCorrect) {
+          score += 10;
+          alert(`✅ Bravo ! C'est bien "${filmTitle}".\nScore : ${score}`);
+        } else {
+          alert(`❌ Non ! Il s'agissait de "${filmTitle}".`);
         }
       }
     }
