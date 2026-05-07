@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scène 3D Gothique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0e0c1a;
+  overflow: hidden;
+  font-family: 'Cinzel', serif;
+}
+
+canvas { display: block; cursor: grab; }
+canvas:active { cursor: grabbing; }
+
+/* ── NAV BUTTONS ── */
+#ui {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+.btn {
+  background: rgba(20, 14, 40, 0.92);
+  border: 1px solid rgba(120, 80, 200, 0.45);
+  color: #c8b8f0;
+  padding: 8px 15px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 3px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.btn:hover {
+  background: rgba(80, 40, 160, 0.6);
+  border-color: rgba(180, 130, 255, 0.7);
+  color: #e8d8ff;
+}
+
+/* ── TUTORIAL OVERLAY ── */
+#tuto-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 6, 18, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: overlayIn 0.5s ease forwards;
+}
+
+#tuto-overlay.hidden {
+  animation: overlayOut 0.45s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes overlayIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes overlayOut { from { opacity: 1; } to { opacity: 0; } }
+
+.tuto-ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.tuto-ambient::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  top: -150px; left: -100px;
+  background: radial-gradient(circle, rgba(90, 50, 180, 0.18) 0%, transparent 70%);
+  animation: drift1 8s ease-in-out infinite alternate;
+}
+.tuto-ambient::after {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  bottom: -100px; right: -80px;
+  background: radial-gradient(circle, rgba(160, 60, 100, 0.14) 0%, transparent 70%);
+  animation: drift2 10s ease-in-out infinite alternate;
+}
+@keyframes drift1 { to { transform: translate(40px, 30px); } }
+@keyframes drift2 { to { transform: translate(-30px, -20px); } }
+
+.tuto-card {
+  position: relative;
+  width: min(460px, 90vw);
+  background: linear-gradient(145deg,
+    rgba(22, 16, 42, 0.97) 0%,
+    rgba(16, 11, 32, 0.98) 50%,
+    rgba(20, 13, 38, 0.97) 100%
+  );
+  border: 1px solid rgba(110, 70, 200, 0.3);
+  border-radius: 4px;
+  padding: 44px 42px 36px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 8px 40px rgba(0,0,0,0.6),
+    0 0 80px rgba(80, 40, 160, 0.12),
+    inset 0 1px 0 rgba(160, 120, 255, 0.07);
+  animation: cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.975); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.tuto-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 40px; right: 40px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(160, 120, 255, 0.4),
+    rgba(200, 160, 255, 0.6),
+    rgba(160, 120, 255, 0.4),
+    transparent
+  );
+}
+
+.tuto-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 40px; right: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(100, 60, 180, 0.2), transparent);
+}
+
+.tuto-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.tuto-chip-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: rgba(160, 120, 255, 0.6);
+}
+.tuto-chip-line {
+  width: 32px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(140, 90, 230, 0.5), transparent);
+}
+
+.tuto-title {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ddd0f5;
+  line-height: 1.15;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.tuto-sub {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(180, 140, 255, 0.5);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 26px;
+}
+
+.tuto-sep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.tuto-sep-line {
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, rgba(100,60,180,0.4), transparent);
+}
+.tuto-sep-diamond {
+  width: 5px; height: 5px;
+  background: rgba(160,110,240,0.5);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.tuto-text {
+  font-family: 'Crimson Text', serif;
+  font-size: 17.5px;
+  line-height: 1.8;
+  color: rgba(210, 195, 240, 0.78);
+  margin-bottom: 36px;
+  font-style: italic;
+}
+
+.tuto-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tuto-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.tuto-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid rgba(120, 80, 200, 0.4);
+  transition: all 0.35s ease;
+}
+.tuto-dot.on {
+  background: rgba(160, 110, 255, 0.9);
+  border-color: rgba(180, 130, 255, 0.8);
+  box-shadow: 0 0 10px rgba(193, 168, 233, 0.7), 0 0 20px rgba(120, 60, 220, 0.3);
+  transform: scale(1.2);
+}
+
+.tuto-cta {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #0e0c1a;
+  background: linear-gradient(135deg, #b888ff 0%, #9050e0 50%, #7030c0 100%);
+  border: none;
+  padding: 12px 26px;
+  cursor: pointer;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(120, 60, 220, 0.4);
+}
+.tuto-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.tuto-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(140, 80, 255, 0.55);
+}
+.tuto-cta:hover::before { opacity: 1; }
+.tuto-cta:active { transform: translateY(0); }
+
+#tuto-step-content {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div id="ui">
+  <button class="btn" id="btn-iso">Isom&#233;trique</button>
+  <button class="btn" id="btn-hall">Grand Hall</button>
+  <button class="btn" id="btn-crypt">Crypte</button>
+  <button class="btn" id="btn-study">&#201;tude</button>
+  <button class="btn" id="btn-bath">Salle de Bain</button>
+</div>
+
+<!-- TUTORIAL OVERLAY -->
+<div id="tuto-overlay">
+  <div class="tuto-ambient"></div>
+  <div class="tuto-card">
+
+    <div class="tuto-chip">
+      <span class="tuto-chip-label" id="tuto-eyebrow">Tutoriel</span>
+      <span class="tuto-chip-line"></span>
+    </div>
+
+    <div id="tuto-step-content">
+      <div class="tuto-title" id="tuto-title">TUTORIEL</div>
+      <div class="tuto-sub"   id="tuto-sub">&#192; propos</div>
+      <div class="tuto-sep">
+        <div class="tuto-sep-diamond"></div>
+        <div class="tuto-sep-line"></div>
+      </div>
+      <div class="tuto-text"  id="tuto-text">
+        Bienvenue dans le manoir hant&#233;&#160;! Votre mission&#160;: explorer cet univers 3D et d&#233;nicher les objets de l&#8217;univers des Vampires dissimul&#233;s dans toutes les pi&#232;ces du manoir hant&#233;.
+      </div>
+    </div>
+
+    <div class="tuto-actions">
+      <div class="tuto-dots" id="tuto-dots">
+        <div class="tuto-dot on"></div>
+        <div class="tuto-dot"></div>
+        <div class="tuto-dot"></div>
+        <div class="tuto-dot"></div>
+      </div>
+      <button class="tuto-cta" id="tuto-next-btn">SUIVANT</button>
+    </div>
+
+  </div>
+</div>
+
+<script type="module" src="/src/main.js"></script>
+
+<script>
+const steps =[
+  {
+    eyebrow : 'Tutoriel',
+    title   : 'TUTORIEL',
+    sub     : '\u00C0 propos',
+    text    : 'Bienvenue dans le manoir hant\u00E9\u00A0! Votre mission\u00A0: explorer cet univers 3D et d\u00E9nicher les objets de l\u2019univers des Vampires dissimul\u00E9s dans toutes les pi\u00E8ces du manoir hant\u00E9.',
+    btn     : 'SUIVANT'
+  },
+  {
+    eyebrow : 'Le But Du Jeu',
+    title   : 'Le But Du Jeu',
+    sub     : 'Identifier les myst\u00E8res',
+    text    : 'Il ne suffit pas de les trouver\u2026 Cliquez sur un objet mythique et testez vos connaissances en devinant exactement de quel film ou s\u00E9rie cet objet fait r\u00E9f\u00E9rence\u00A0!',
+    btn     : 'SUIVANT'
+  },
+  {
+    eyebrow : 'Tutoriel',
+    title   : 'TUTORIEL',
+    sub     : 'Les R\u00E8gles',
+    text    : 'Attention, ton temps est compt\u00E9\u00A0! Vous disposez d\u2019un chronom\u00E8tre et de seulement \u2764\uFE0F\u2764\uFE0F\u2764\uFE0F (3 vies). Chaque mauvaise r\u00E9ponse vous rapproche de la fin de votre parcours.',
+    btn     : 'SUIVANT'
+  },
+  {
+    eyebrow : '\u00C0 propos du Score',
+    title   : '\u00C0 propos du Score',
+    sub     : 'Le Score',
+    text    : 'Plus l\u2019objet est difficile \u00E0 trouver, plus vous gagnez de points. C\u2019est \u00E0 vous de jouer\u00A0!',
+    btn     : 'RENTRER DANS L\u2019UNIVERS'
+  }
+];
+
+let current = 0;
+
+const overlay     = document.getElementById('tuto-overlay');
+const eyebrowEl   = document.getElementById('tuto-eyebrow');
+const titleEl     = document.getElementById('tuto-title');
+const subEl       = document.getElementById('tuto-sub');
+const textEl      = document.getElementById('tuto-text');
+const nextBtn     = document.getElementById('tuto-next-btn');
+const dotsEl      = document.getElementById('tuto-dots');
+const stepContent = document.getElementById('tuto-step-content');
+
+function updateDots() {
+  dotsEl.querySelectorAll('.tuto-dot').forEach((d, i) => {
+    d.classList.toggle('on', i === current);
+  });
+}
+
+function goTo(idx) {
+  stepContent.style.opacity   = '0';
+  stepContent.style.transform = 'translateX(-12px)';
+
+  setTimeout(function() {
+    var s = steps[idx];
+    eyebrowEl.textContent = s.eyebrow;
+    titleEl.textContent   = s.title;
+    subEl.textContent     = s.sub;
+    textEl.textContent    = s.text;
+    nextBtn.textContent   = s.btn;
+
+    stepContent.style.transition = 'none';
+    stepContent.style.transform  = 'translateX(14px)';
+    stepContent.style.opacity    = '0';
+
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        stepContent.style.transition = 'opacity 0.32s ease, transform 0.32s cubic-bezier(0.22,1,0.36,1)';
+        stepContent.style.opacity    = '1';
+        stepContent.style.transform  = 'translateX(0)';
+      });
+    });
+
+    updateDots();
+  }, 180);
+
+  stepContent.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+}
+
+nextBtn.addEventListener('click', function() {
+  if (current < steps.length - 1) {
+    current++;
+    goTo(current);
+  } else {
+    overlay.classList.add('hidden');
+    setTimeout(function() { overlay.style.display = 'none'; }, 450);
+  }
+});
+</script>
+
+</body>
+</html>
